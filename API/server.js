@@ -11,6 +11,7 @@ const connection = await mysql2.createConnection({
   database: process.env.DATABASE
 });
 
+// TODO: Inicinado o express, configurando o json e liberando o acesso à api para qualquer url.
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -20,6 +21,7 @@ app.get('/usuarios', async (req, res) => {
   let sql = "SELECT * FROM users WHERE 1=1";
   const params = [];
 
+  //TODO: Tornando a consulta por URL dinamica. Os parametros serão adicionados dentro do tray. 
   if (req.query.name) {
     sql += " AND nome = ?";
     params.push(req.query.name);
@@ -49,10 +51,16 @@ app.post('/usuarios', async (req, res) => {
   console.log(sql);
 
   try {
-    const [results, fields] = await connection.query(sql)
-    console.log(results, fields);
+    await connection.query(sql)
   }catch (e) {
-    console.log(e)
+    if (e.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        error: "Esse e-mail já foi cadastrado"
+      });
+    }
+    return res.status(500).json({
+      error: "Erro interno do servidor"
+    });
   } 
 
   res.status(201).json(req.body);
