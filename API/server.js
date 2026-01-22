@@ -17,15 +17,26 @@ app.use(cors());
 
 app.get('/usuarios', async (req, res) => {
   
-  let sql = `SELECT * FROM users;`
+  let sql = "SELECT * FROM users WHERE 1=1";
+  const params = [];
 
-  //! Verificar como faz para isso ser dinamico.
+  if (req.query.name) {
+    sql += " AND nome = ?";
+    params.push(req.query.name);
+  }
+
   if (req.query.age) {
-    sql = `SELECT * FROM users WHERE idade = '${req.query.age}'`
+    sql += " AND idade = ?";
+    params.push(req.query.age);
+  }
+
+  if (req.query.email) {
+    sql += " AND email = ?";
+    params.push(req.query.email);
   }
   
   try {
-    const [results, fields] = await connection.query(sql);
+    const [results, fields] = await connection.query(sql, params);
     res.status(200).json(results);
   } catch (e) {
     console.log(e)
