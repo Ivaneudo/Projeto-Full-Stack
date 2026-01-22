@@ -20,11 +20,20 @@ function Home() {
 
   async function postUsers() {
 
-    await Api.post('/usuarios', {
-      name:  inputNome.current.value, 
-      age: inputIdade.current.value,
-      email: inputEmail.current.value
-    })
+    try {
+      await Api.post('/usuarios', {
+        name:  inputNome.current.value, 
+        age: inputIdade.current.value,
+        email: inputEmail.current.value
+      })
+    } catch (e) {
+      //TODO: Tratando o erro caso o e-mail esteja duplicado.
+      if (e.code === "ERR_BAD_RESPONSE") {
+        alert("Erro: E-mail já cadastrado.")
+      }
+      console.log(e);
+    }
+    
 
     getUsers()
   }
