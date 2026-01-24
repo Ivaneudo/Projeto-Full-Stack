@@ -46,18 +46,32 @@ app.get('/usuarios', async (req, res) => {
 });
 
 app.post('/usuarios', async (req, res) => {
-  
+
+
+  if (!req.body.name || !req.body.age || !req.body.email) {
+    return res.status(400).json({
+      error: "Algum capo vazio"
+    });
+  }
+
   const sql = `INSERT INTO users (nome, idade, email) VALUES ('${req.body.name}', '${req.body.age}', '${req.body.email}')`;
   console.log(sql);
 
   try {
     await connection.query(sql)
   }catch (e) {
+    console.log(e)
     if (e.code === "ER_DUP_ENTRY") {
       return res.status(409).json({
         error: "Esse e-mail já foi cadastrado"
       });
     }
+    if (e.code === "ER_DATA_TOO_LONG") {
+      return res.status(400).json({
+        error: "Nome com muitos caracters"
+      })
+    }
+
     return res.status(500).json({
       error: "Erro interno do servidor"
     });
