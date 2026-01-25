@@ -1,22 +1,9 @@
-import express from 'express';
-import cors from 'cors';
-import 'dotenv/config'
-import mysql2 from 'mysql2/promise';
+import { Router } from "express";
+import { connection } from "../databases/connection.js";
 
-// TODO: Conexão com o banco de dados. 
-const connection = await mysql2.createConnection({
-  host: process.env.HOST,
-  user: process.env.DB_USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE
-});
+const router = Router();
 
-// TODO: Inicinado o express, configurando o json e liberando o acesso à api para qualquer url.
-const app = express();
-app.use(express.json());
-app.use(cors());
-
-app.get('/usuarios', async (req, res) => {
+router.get('/usuarios', async (req, res) => {
   
   let sql = "SELECT * FROM users WHERE 1=1";
   const params = [];
@@ -45,7 +32,7 @@ app.get('/usuarios', async (req, res) => {
   }
 });
 
-app.post('/usuarios', async (req, res) => {
+router.post('/usuarios', async (req, res) => {
 
 
   if (!req.body.name || !req.body.age || !req.body.email) {
@@ -80,7 +67,7 @@ app.post('/usuarios', async (req, res) => {
   res.status(201).json(req.body);
 })
 
-app.put('/usuarios/:id', async (req, res) => {
+router.put('/usuarios/:id', async (req, res) => {
   const sql = `UPDATE users SET nome = '${req.body.name}', idade = '${req.body.age}', email = '${req.body.email}' WHERE id=${req.params.id}`
 
   try {
@@ -92,7 +79,7 @@ app.put('/usuarios/:id', async (req, res) => {
   }
 })
 
-app.delete('/usuarios/:id', async (req, res) => {
+router.delete('/usuarios/:id', async (req, res) => {
   const sql = `DELETE FROM users WHERE id=${req.params.id}`  
 
   try {
@@ -104,5 +91,4 @@ app.delete('/usuarios/:id', async (req, res) => {
   }
 })
 
-app.listen(3000);
-console.log(`O servidor está rodando na porta 3000.`)
+export default router;
