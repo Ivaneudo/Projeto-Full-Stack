@@ -15,7 +15,7 @@ function Home() {
     inputEmail,
     postUsers,
     deleteUsers
-   } = useUsers()
+  } = useUsers()
   
   return (
     <>
